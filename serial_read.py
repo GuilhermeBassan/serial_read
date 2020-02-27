@@ -11,7 +11,7 @@ db = sql.connect(host = 'localhost',
 		 unix_socket = '',
 		 cursorclass = pymysql.cursors.DictCursor)
 """
-ser = serial.Serial(port = '/dev/ttyS0',		# Start Serial object in  port ttyS0
+zb = serial.Serial(port = '/dev/ttyS0',			# Start Serial object in  port ttyS0
 		    baudrate = 9600,			# Set baud rate at 9600bps
 		    parity = serial.PARITY_NONE,	# Set parity to NONE
 		    stopbits = serial.STOPBITS_ONE,	# Set stop bits to ONE
@@ -36,25 +36,26 @@ def breakPacket(pack):
 	packetVD = ""				# Empty string for the verification digit
 	packetET = ""				# Empty string for the event type
 	packetID = ""				# Empty string for the message ID
-	packetSerial = ""			# Empty string for the message serial
+	packetSE = ""				# Empty string for the message serial
 	for i in range (1, 4):			# Range of the Packet ID
 		packetID += pack[i]		# Append ID info
 	packetET = pack[4]			# Packet event type
 	for i in range (5, len(pack) - 3):	# Range of the serial
-		packetSerial += pack[i]		# Append serial info
+		packetSE += pack[i]		# Append serial info
 	packetVD = pack[len(pack) - 3]		# Packet verifier digit
-	return packetVD, packetET, packetID, packetSerial
+	return packetID, packetSE, packetET, packetVD
 
 def clear():
 	os.system('cls' if os.name == 'nt' else 'clear')
 
 while True:
 
-	x = ser.read()
+	x = zb.read()
 	if x != b'\x00' and x != b'':			# If not NULL and not EMPTY
 		packet += x.decode("utf-8", "ignore")	# Add byte to packet string
 	if x == b'\x00':				# If the byte is null
 		print(packet)				# Prints packet
-		VD, ET, ID, SE = breakPacket(packet)
+		ID, SE, ET, VD = breakPacket(packet)
 		makeJson(ID, SE, ET, VD)
-		
+		packet = ""
+
