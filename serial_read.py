@@ -11,16 +11,17 @@ db = sql.connect(host = 'localhost',
 		 unix_socket = '',
 		 cursorclass = pymysql.cursors.DictCursor)
 """
-zb = serial.Serial(port = '/dev/ttyS0',			# Start Serial object in  port ttyS0
-		    baudrate = 9600,			# Set baud rate at 9600bps
-		    parity = serial.PARITY_NONE,	# Set parity to NONE
-		    stopbits = serial.STOPBITS_ONE,	# Set stop bits to ONE
-		    bytesize = serial.EIGHTBITS,	# Set byte size to EIGHT
-		    timeout = 1)			# Set timeout to 1
 
 packet = ""		# Empty string for the received packet
 data = {}		# Empty dataset
 data['Event'] = []	# Empty subset
+
+zb = serial.Serial(port = '/dev/ttyS0',			# Start Serial object in  port ttyS0
+		   baudrate = 9600,			# Set baud rate at 9600bps
+		   parity = serial.PARITY_NONE,		# Set parity to NONE
+		   stopbits = serial.STOPBITS_ONE,	# Set stop bits to ONE
+		   bytesize = serial.EIGHTBITS,		# Set byte size to EIGHT
+		   timeout = 1)				# Set timeout to 1
 
 def makeJson(id, serial, et, vd):
 	data['Event'].append({				# Append items on the json
@@ -43,6 +44,10 @@ def breakPacket(pack):
 	for i in range (5, len(pack) - 3):	# Range of the serial
 		packetSE += pack[i]		# Append serial info
 	packetVD = pack[len(pack) - 3]		# Packet verifier digit
+	print("ID =", packetID,
+	      "SE =", packetSE,
+	      "ET =", packetET,
+	      "VD =", packetVD)
 	return packetID, packetSE, packetET, packetVD
 
 def clear():
